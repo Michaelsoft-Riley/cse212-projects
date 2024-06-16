@@ -77,7 +77,7 @@ public static class ArraysTester {
         // startIndex = dataLength - amount
         // slice1 = GetRange(startIndex, amount)
         // slice2 = GetRange(0, startIndex)
-        // copy over slices 1 and 2 over to data list
+        // merge slices 1 and 2 into data list
 
         // create slices for new first and last portions of data list
         int dataLength = data.Count();
