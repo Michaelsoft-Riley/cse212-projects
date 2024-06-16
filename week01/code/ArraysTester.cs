@@ -1,3 +1,5 @@
+using System.Data;
+
 public static class ArraysTester {
     /// <summary>
     /// Entry point for the tests
@@ -39,7 +41,20 @@ public static class ArraysTester {
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
 
-        return new double[0]; // replace this return statement with your own
+        // Step 1: analyze necessary behavior
+        // repeat (multiples list += number * index) length times
+
+        var multiples = new double[length];
+        // repeat (add number * index to multiples list) length times
+        for (int i = 0; i < length; i++)
+        {
+            // We need (length) multiples. We want our first multiple to be > 0, so we add 1 to i to skip over 0.
+            double currentNum = i + 1;
+            double multiple = currentNum * number;
+            multiples[i] = multiple;
+        }
+
+        return multiples;
     }
     
     /// <summary>
@@ -57,5 +72,30 @@ public static class ArraysTester {
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
 
+        // Step 1: Analyze necessary behavior
+        // endIndex = data.Count() - 1
+        // startIndex = dataLength - amount
+        // slice1 = GetRange(startIndex, amount)
+        // slice2 = GetRange(0, startIndex)
+        // copy over slices 1 and 2 over to data list
+
+        // create slices for new first and last portions of data list
+        int dataLength = data.Count();
+        int endIndex = dataLength - 1;
+        int startIndex = dataLength - amount;
+        List<int> slice1 = data.GetRange(startIndex, amount);
+        List<int> slice2 = data.GetRange(0, startIndex);
+
+        // merge first and last slices into data list
+        for (int i = 0; i < slice1.Count(); i++)
+        {
+            data[i] = slice1[i];
+        }
+        for (int i = 0; i < slice2.Count(); i++)
+        {
+            int dataIndex = i + amount;
+            data[dataIndex] = slice2[i];
+            dataIndex++;
+        }
     }
 }
