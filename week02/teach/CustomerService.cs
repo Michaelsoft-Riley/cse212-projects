@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿using System.Diagnostics;
+
+/// <summary>
 /// Maintain a Customer Service Queue.  Allows new customers to be 
 /// added and allows customers to be serviced.
 /// </summary>
@@ -11,24 +13,62 @@ public class CustomerService {
         // Test Cases
 
         // Test 1
-        // Scenario: 
-        // Expected Result: 
+        // Scenario: User tries to give a max Customer Service Queue size <= 0
+        // Expected Result: Queue size defaults to 10
         Console.WriteLine("Test 1");
+        var cs = new CustomerService(0);
+        Trace.Assert(cs._maxSize == 10, "_maxSize should be 10");
+        cs = new CustomerService(-1);
+        Trace.Assert(cs._maxSize == 10, "_maxSize should be 10");
 
-        // Defect(s) Found: 
-
+        // Defect(s) Found: None
         Console.WriteLine("=================");
 
         // Test 2
-        // Scenario: 
-        // Expected Result: 
+        // Scenario: AddNewCustomer is called
+        // Expected Result: A new customer is enqueued
         Console.WriteLine("Test 2");
+        cs = new CustomerService(1);
+        cs.AddNewCustomer();
+        Trace.Assert(cs._queue.Count == 1, "Customer was not added to queue");
 
-        // Defect(s) Found: 
-
+        // Defect(s) Found: None
         Console.WriteLine("=================");
 
-        // Add more Test Cases As Needed Below
+        // Test 3
+        // Scenario: Queue is full and user attempts to add a customer
+        // Expected Result: An error message is displayed at the second new customer
+        Console.WriteLine("Test 3");
+        cs = new CustomerService(1);
+        cs.AddNewCustomer();
+        cs.AddNewCustomer();
+
+        // Defect(s) Found: changed > to >= so that it doesn't cause an index range error
+        Console.WriteLine("=================");
+
+        // Test 4
+        // Scenario: ServeCustomer is called
+        // Expected Result: ServeCustomer dequeues the next customer and displays details
+        Console.WriteLine("Test 4");
+        cs = new CustomerService(2);
+        cs.AddNewCustomer();
+        cs.AddNewCustomer();
+        cs.ServeCustomer();
+        cs.ServeCustomer();
+        Trace.Assert(cs._queue.Count == 0, "Queue is not empty. Something went wrong.");
+
+        // Defect(s) Found: customer was being removed from queue before being used
+        Console.WriteLine("=================");
+
+        // Test 5
+        // Scenario: Queue is empty and ServeCustomer is called
+        // Expected Result: Error message is displayed
+        Console.WriteLine("Test 5");
+        cs = new CustomerService(1);
+        cs.ServeCustomer();
+
+        // Defect(s) Found: ServeCustomer was not checking whether queue was empty
+        Console.WriteLine("=================");
     }
 
     private readonly List<Customer> _queue = new();
@@ -67,7 +107,7 @@ public class CustomerService {
     /// </summary>
     private void AddNewCustomer() {
         // Verify there is room in the service queue
-        if (_queue.Count > _maxSize) {
+        if (_queue.Count >= _maxSize) {
             Console.WriteLine("Maximum Number of Customers in Queue.");
             return;
         }
@@ -88,9 +128,16 @@ public class CustomerService {
     /// Dequeue the next customer and display the information.
     /// </summary>
     private void ServeCustomer() {
-        _queue.RemoveAt(0);
-        var customer = _queue[0];
-        Console.WriteLine(customer);
+        if (_queue.Count <= 0)
+        {
+            Console.WriteLine("Queue is empty");
+        }
+        else
+        {
+            var customer = _queue[0];
+            Console.WriteLine(customer);
+            _queue.RemoveAt(0);
+        }
     }
 
     /// <summary>
