@@ -15,8 +15,14 @@ public class PersonQueue {
     }
 
     public Person Dequeue() {
-        var person = _queue[0];
-        _queue.RemoveAt(0);
+        var person = _queue[^1];
+        _queue.RemoveAt(Length-1);
+
+        // Enqueue if person gets infinite turns (represented as 0 or less turns)
+        if (person.Turns <= 0) {
+            Enqueue(person);
+        }
+
         return person;
     }
 
