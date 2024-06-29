@@ -111,6 +111,24 @@ public static class SetsAndMapsTester {
         // To display the pair correctly use something like:
         // Console.WriteLine($"{word} & {pair}");
         // Each pair of words should displayed on its own line.
+        HashSet<string> seenWords = new HashSet<string>();
+
+        foreach (string word in words) {
+            // reverse word characters
+            char char1 = word[0];
+            char char2 = word[1];
+            string reversedWord = $"{char2}{char1}";
+
+            // make sure that repeating a letter in a word does not lead to duplicates (ex: "aa")
+            if (word == reversedWord) {
+                // do nothing
+            }
+            // check if reversedWord has been seen yet
+            else if (seenWords.Contains($"{char2}{char1}"))
+                Console.WriteLine($"{word} & {reversedWord}");
+
+            seenWords.Add(word);
+        }
     }
 
     /// <summary>
@@ -132,6 +150,11 @@ public static class SetsAndMapsTester {
         foreach (var line in File.ReadLines(filename)) {
             var fields = line.Split(",");
             // Todo Problem 2 - ADD YOUR CODE HERE
+            string degree = fields[3];
+            if (degrees.ContainsKey(degree))
+                degrees[degree] += 1;
+            else
+                degrees[degree] = 1;
         }
 
         return degrees;
@@ -158,13 +181,57 @@ public static class SetsAndMapsTester {
     /// #############
     private static bool IsAnagram(string word1, string word2) {
         // Todo Problem 3 - ADD YOUR CODE HERE
-        return false;
+        var charCount1 = StringToDict(word1);
+        var charCount2 = StringToDict(word2);
+
+        // Check if charCount2 contains every key, value pair in charCount1
+        foreach (KeyValuePair<char, int> entry in charCount1)
+            if (charCount2.ContainsKey(entry.Key))
+                if (entry.Value == charCount2[entry.Key])
+                    // Remove each  matching pair from charCount2. This will be used to check for extra characters later.
+                    charCount2.Remove(entry.Key);
+                else
+                    return false;
+            else
+                return false;
+
+        // Check if charCount2 contains extra characters
+        if (charCount2.Count() != 0)
+            return false;
+
+        return true;
+
+        // Takes a string, adds each unique letter to a dictionary, counts the number of times
+        // each letter occurs and saves that to the dictionary, and returns the dictionary
+        static Dictionary<char,int> StringToDict(string word) {
+            Dictionary<char, int> seenChars = [];
+
+            for (int c = 0; c < word.Length; c++) {
+                // ignore spaces
+                if (word[c] != ' ') {
+                    // convert character to lower case
+                    char letter = char.ToLower(word[c]);
+
+                    // increment value in seenChars, or add letter to seenChars
+                    if (seenChars.ContainsKey(letter)) {
+                        seenChars[letter]++;
+                    }
+                    else {
+                        seenChars[letter] = 1;
+                    }
+                }
+            }
+
+            return seenChars;
+        }
     }
 
     /// <summary>
     /// Sets up the maze dictionary for problem 4
     /// </summary>
     private static Dictionary<ValueTuple<int, int>, bool[]> SetupMazeMap() {
+        // bool values indicate whether a direction can be moved in from the current point (key)
+        //                  ( left, right, up down )
         Dictionary<ValueTuple<int, int>, bool[]> map = new() {
             { (1, 1), new[] { false, true, false, true } },
             { (1, 2), new[] { false, true, true, false } },
@@ -235,5 +302,6 @@ public static class SetsAndMapsTester {
         // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to print out each place a earthquake has happened today and its magitude.
+        featureCollection.Display();
     }
 }
