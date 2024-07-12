@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 public static class RecursionTester {
     /// <summary>
     /// Entry point for the Prove 8 tests
@@ -67,7 +69,7 @@ public static class RecursionTester {
         Console.WriteLine(CountWaysToClimb(20)); // 121415
         // Uncomment out the test below after implementing memoization.  It won't work without it.
         // TODO Problem 3
-        // Console.WriteLine(CountWaysToClimb(100));  // 180396380815100901214157639
+        Console.WriteLine(CountWaysToClimb(100));  // 180396380815100901214157639
 
         // Sample Test Cases (may not be comprehensive) 
         Console.WriteLine("\n=========== PROBLEM 4 TESTS ===========");
@@ -147,7 +149,13 @@ public static class RecursionTester {
     /// </summary>
     public static int SumSquaresRecursive(int n) {
         // TODO Start Problem 1
-        return 0;
+        if (n <= 1) {
+            return 1;
+        }
+        else {
+            var result = SumSquaresRecursive(n-1);
+            return n * n + result;
+        }
     }
 
     /// <summary>
@@ -171,6 +179,15 @@ public static class RecursionTester {
     /// </summary>
     public static void PermutationsChoose(string letters, int size, string word = "") {
         // TODO Start Problem 2
+        if (word.Length == size) {
+            Console.WriteLine(word);
+        }
+        else {
+            for (int i = 0; i < letters.Length; i++) {
+                var lettersLeft = letters.Remove(i, 1);
+                PermutationsChoose(lettersLeft, size, word + letters[i]);
+            }
+        }
     }
 
     /// <summary>
@@ -229,8 +246,17 @@ public static class RecursionTester {
         if (s == 3)
             return 4;
 
+        if (remember == null) {
+            remember = new Dictionary<int, decimal>();
+        }
+
+        if (remember.ContainsKey(s)) {
+            return remember[s];
+        }
+
         // Solve using recursion
-        decimal ways = CountWaysToClimb(s - 1) + CountWaysToClimb(s - 2) + CountWaysToClimb(s - 3);
+        decimal ways = CountWaysToClimb(s - 1, remember) + CountWaysToClimb(s - 2, remember) + CountWaysToClimb(s - 3, remember);
+        remember[s] = ways;
         return ways;
     }
 
@@ -248,7 +274,28 @@ public static class RecursionTester {
     /// some of the string functions like IndexOf and [..X] / [X..] to be useful in solving this problem.
     /// </summary>
     public static void WildcardBinary(string pattern) {
-        // TODO Start Problem 4
+        // find an asterisk
+        var i = pattern.IndexOf('*');
+
+        if (i > -1) {
+            // get the text before and after i in the string
+            var preceeding = pattern[..i];
+            var following = pattern[(i+1)..];
+
+            // Replace the asterisk with zero and then 1
+            // Repeat for each new value of i until there are no more asterisks
+            pattern = preceeding + '0' + following;
+            WildcardBinary(pattern);
+
+            pattern = preceeding + '1' + following;
+            WildcardBinary(pattern);
+        }
+
+        else {
+            // base case (i == chars.Length)
+            Console.WriteLine(pattern);
+            return;
+        }
     }
 
     /// <summary>
@@ -261,11 +308,49 @@ public static class RecursionTester {
         if (currPath == null)
             currPath = new List<ValueTuple<int, int>>();
 
-        // currPath.Add((1,2)); // Use this syntax to add to the current path
-
         // TODO Start Problem 5
-        // ADD CODE HERE
+        currPath.Add((x, y));
 
-        // Console.WriteLine(currPath.AsString()); // Use this to print out your path when you find the solution
+        // Display solution paths
+        if (maze.IsEnd(x, y)) {
+            Console.WriteLine(currPath.AsString()); // Use this to print out your path when you find the solution
+        }
+
+        // get coordinates for each direction from current position
+        foreach (var direction in DIRECTIONS) 
+        {
+            // get the coordinates for movement in a given direction
+            var coord = GetNewCoords(x, y, direction);
+            // check if direction can be moved in
+            if (maze.IsValidMove(currPath, coord.Item1, coord.Item2)) 
+            {
+                // repeat from the new location
+                SolveMaze(maze, coord.Item1, coord.Item2, currPath);
+            }
+        }
+
+        // Base case
+        // DeadEnd. Once every path from the current location is exhausted, the coordinate is removed from currPath.
+        currPath.Remove((x, y));
+    }
+
+    public static List<string> DIRECTIONS = new List<string> { "left", "right", "down", "up"};
+    public static ValueTuple<int, int> GetNewCoords(int x, int y, string direction) {
+        // takes the current coordinates and the direction to be moved in, and returns the new coordinates
+        ValueTuple<int, int> coords = new();
+
+        switch (direction) 
+        {
+            case "left": coords = (x-1, y);
+            break;
+            case "right": coords = (x+1, y);
+            break;
+            case "down": coords = (x, y-1);
+            break;
+            case "up": coords = (x, y+1);
+            break;
+        }
+
+        return coords;
     }
 }
