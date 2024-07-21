@@ -47,18 +47,10 @@ public class Node {
         }
     }
 
-    public int GetHeight() {
-        // TODO Start Problem 4
-        if (this is null) {
-            return 0;
-        }
-        else {
-            int left = Left?.GetHeight() ?? 0;
-            int right = Right?.GetHeight() ?? 0;
-            if (left > right)
-                return left + 1;
-            else
-                return right + 1;
-        }
+    public int GetHeight()
+    {
+        int leftHeight = Left?.GetHeight() ?? 0;
+        int rightHeight = Right?.GetHeight() ?? 0; 
+        return Math.Max(leftHeight, rightHeight) + 1;
     }
 }
